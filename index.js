@@ -18,7 +18,7 @@ app.post("/query-database/:id", async (req, res) => {
       req.body || {},
       {
         headers: {
-          "Authorization": `Bearer ${NOTION_API_KEY}`,
+          "Authorization": `Bearer ${NOTION_TOKEN}`,
           "Notion-Version": "2022-06-28",
           "Content-Type": "application/json"
         },

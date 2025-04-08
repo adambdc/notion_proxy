@@ -7,6 +7,35 @@ const NOTION_TOKEN = process.env.NOTION_TOKEN; // ← secure token set in Render
 
 app.use(express.json());
 
+
+
+// added for databases
+app.post("/query-database/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await axios.post(
+      `https://api.notion.com/v1/databases/${id}/query`,
+      req.body || {},
+      {
+        headers: {
+          "Authorization": `Bearer ${NOTION_API_KEY}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json"
+        },
+      }
+    );
+    res.status(200).json(response.data);
+  } catch (error) {
+    res.status(error?.response?.status || 500).json({
+      error: "Database query failed",
+      message: error?.message || "Unknown error",
+      data: error?.response?.data || {},
+    });
+  }
+});
+
+// end add
+
 app.get("/blocks/:block_id/children", async (req, res) => {
   const blockId = req.params.block_id;
 

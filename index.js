@@ -3,22 +3,19 @@ const axios = require("axios");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const NOTION_TOKEN = process.env.NOTION_TOKEN; // ← secure token set in Render
+
 app.use(express.json());
 
 app.get("/blocks/:block_id/children", async (req, res) => {
-  const notionToken = req.headers.authorization;
   const blockId = req.params.block_id;
-
-  if (!notionToken) {
-    return res.status(401).json({ error: "Missing Authorization header" });
-  }
 
   try {
     const notionRes = await axios.get(
       `https://api.notion.com/v1/blocks/${blockId}/children`,
       {
         headers: {
-          Authorization: notionToken,
+          Authorization: `Bearer ${NOTION_TOKEN}`,
           "Notion-Version": "2022-06-28"
         }
       }

@@ -3,7 +3,7 @@ const axios = require("axios");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// edit out const NOTION_TOKEN = process.env.NOTION_TOKEN; // ← secure token set in Render
+const NOTION_TOKEN = process.env.NOTION_TOKEN; // ← secure token set in Render
 
 app.use(express.json());
 

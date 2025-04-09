@@ -3,12 +3,11 @@ const axios = require("axios");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const NOTION_TOKEN = process.env.NOTION_TOKEN; // ← secure token set in Render
+const NOTION_TOKEN = process.env.NOTION_TOKEN; // secure token set in Render
 
 app.use(express.json());
 
-
-// added for databases
+// Query a database
 app.post("/query-database/:id", async (req, res) => {
   const { id } = req.params;
   try {
@@ -17,8 +16,7 @@ app.post("/query-database/:id", async (req, res) => {
       req.body || {},
       {
         headers: {
-          // "Authorization": `Bearer ${NOTION_TOKEN}`, <-edit out
-          Authorization: `Bearer ${process.env.NOTION_TOKEN}`, //add
+          Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
           "Notion-Version": "2022-06-28",
           "Content-Type": "application/json"
         },
@@ -34,9 +32,7 @@ app.post("/query-database/:id", async (req, res) => {
   }
 });
 
-// end add
-
-//add for write
+// Add a page (raw body support)
 app.post("/add-page", async (req, res) => {
   try {
     const response = await axios.post("https://api.notion.com/v1/pages", req.body, {
@@ -55,11 +51,10 @@ app.post("/add-page", async (req, res) => {
     });
   }
 });
-//end add
 
+// Read block children
 app.get("/blocks/:block_id/children", async (req, res) => {
   const blockId = req.params.block_id;
-
   try {
     const notionRes = await axios.get(
       `https://api.notion.com/v1/blocks/${blockId}/children`,
@@ -77,6 +72,51 @@ app.get("/blocks/:block_id/children", async (req, res) => {
       error: "Notion API request failed",
       message: error.message,
       data: error.response?.data || null
+    });
+  }
+});
+
+// ✔️ NEW: Insert glossary-style record
+app.post("/insert-record", async (req, res) => {
+  const databaseId = "1cf541b7014b80b88c8cfd7de97a80b3"; // ← Replace this with your actual DB ID
+
+  const { Term, Definition, Category, Synonyms = [] } = req.body;
+
+  try {
+    const response = await axios.post(
+      "https://api.notion.com/v1/pages",
+      {
+        parent: { database_id: databaseId },
+        properties: {
+          Name: {
+            title: [{ text: { content: Term } }],
+          },
+          Definition: {
+            rich_text: [{ text: { content: Definition } }],
+          },
+          Category: {
+            select: { name: Category },
+          },
+          Synonyms: {
+            multi_select: Synonyms.map((s) => ({ name: s })),
+          },
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.NOTION_TOKEN}`,
+          "Notion-Version": "2022-06-28",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    res.status(200).json({ success: true, data: response.data });
+  } catch (error) {
+    res.status(error?.response?.status || 500).json({
+      error: "Insert failed",
+      message: error.message,
+      detail: error.response?.data || {},
     });
   }
 });

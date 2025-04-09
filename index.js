@@ -3,7 +3,7 @@ const axios = require("axios");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const NOTION_TOKEN = process.env.NOTION_TOKEN; // ← secure token set in Render
+// edit out const NOTION_TOKEN = process.env.NOTION_TOKEN; // ← secure token set in Render
 
 app.use(express.json());
 
@@ -18,7 +18,8 @@ app.post("/query-database/:id", async (req, res) => {
       req.body || {},
       {
         headers: {
-          "Authorization": `Bearer ${NOTION_TOKEN}`,
+          // "Authorization": `Bearer ${NOTION_TOKEN}`, <-edit out
+          Authorization: `Bearer ${process.env.NOTION_TOKEN}`, //add
           "Notion-Version": "2022-06-28",
           "Content-Type": "application/json"
         },

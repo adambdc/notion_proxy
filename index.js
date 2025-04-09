@@ -78,7 +78,7 @@ app.get("/blocks/:block_id/children", async (req, res) => {
 
 // ✔️ NEW: Insert glossary-style record
 app.post("/insert-record", async (req, res) => {
-  const databaseId = "1cf541b7014b80b88c8cfd7de97a80b3"; // ← Replace this with your actual DB ID
+  const databaseId = "1cf541b7014b80829fb8df336b4aa885"; // ← Replace this with your actual DB ID
 
   const { Term, Definition, Category, Synonyms = [] } = req.body;
 
